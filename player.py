@@ -55,7 +55,7 @@ class Player(CircleShape):
             self.rotate(dt)
         if keys[pygame.K_SPACE]:
             if self.shoot_cooldown > 0:
-                pass
+                return
             else:
                 self.shoot()
                 self.shoot_cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS
