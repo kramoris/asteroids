@@ -9,6 +9,11 @@ wheels/
 # Virtual environments
 .venv
 
+# uv
+.python-version
+pyproject.toml
+uv.lock
+
 # Game log
 game_state.jsonl
 game_events.jsonl
