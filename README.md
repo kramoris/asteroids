@@ -23,7 +23,9 @@ uv pip install pygame==2.6.1
 ```
 
 ## Run
+```bash
 python3 main.py
+```
 
 ## Controls
 W / ↑ – move  
