@@ -8,15 +8,19 @@ Simple Asteroids-style game made during Boot.dev.
 
 ## Install
 If Python 3.13 is installed:
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install pygame==2.6.1
+```
 
 If not:
+```bash
 install uv and run:
 uv venv --python 3.13
 source .venv/bin/activate
 uv pip install pygame==2.6.1
+```
 
 ## Run
 python3 main.py
