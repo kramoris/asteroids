@@ -1,6 +1,6 @@
 # Asteroids Game
 
-Simple Asteroids-style game made during Boot.dev.
+Simple Asteroids-style game made during Boot.dev with some improvements.
 
 ## Requirements
 - Python 3.13
