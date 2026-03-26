@@ -31,6 +31,9 @@ def main():
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
     clock = pygame.time.Clock()
     dt = 0
+    
+    score = 0
+    font = pygame.font.SysFont(None, 36)
 
     while True:
         log_state()
@@ -58,6 +61,10 @@ def main():
                     log_event("asteroid_shot")
                     shot.kill()
                     asteroid.split()
+                    score += 10
+        
+        score_surface = font.render(f"Score: {score}", True, "white")
+        screen.blit(score_surface,(10, 10))
 
         pygame.display.flip()
         dt = clock.tick(60) / 1000
