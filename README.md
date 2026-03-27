@@ -31,4 +31,4 @@ python3 main.py
 W / ↑ – move  
 A / ← – rotate left  
 D / → – rotate right  
-Space – shoot
+Space / Enter – shoot
