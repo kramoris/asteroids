@@ -9,6 +9,9 @@ from shot import Shot
 
 
 def main():
+    lives = 3
+    respawn_timer = 0
+    
     print(f"Starting Asteroids with pygame version: {pygame.version.ver}")
     print(f"Screen width: {SCREEN_WIDTH}\nScreen height: {SCREEN_HEIGHT}")
 
@@ -37,6 +40,9 @@ def main():
 
         if restart_timer > 0:
             restart_timer -= dt
+        
+        if respawn_timer > 0:
+            respawn_timer -= dt
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -58,10 +64,16 @@ def main():
                 sprite.draw(screen)
 
             for asteroid in asteroids:
-                if asteroid.collides_with(player):
+                if asteroid.collides_with(player) and respawn_timer <= 0:
                     log_event("player_hit")
-                    game_over = True
-                    restart_timer = 1.0
+                    lives -= 1
+                    if lives > 0:
+                        player.position = pygame.Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+                        player.velocity = pygame.Vector2(0, 0)
+                        respawn_timer = 2.0
+                    else:
+                        game_over = True
+                        restart_timer = 1.0
 
             for asteroid in asteroids:
                 for shot in shots:
@@ -71,7 +83,9 @@ def main():
                         asteroid.split()
                         score += 10
             score_surface = font.render(f"Score: {score}", True, "white")
+            lives_surface = font.render(f"Lives: {lives}", True, "white")
             screen.blit(score_surface, (10, 10))
+            screen.blit(lives_surface, (10, 50))
 
         else:
             for sprite in drawable:
