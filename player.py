@@ -17,6 +17,8 @@ class Player(CircleShape):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
         self.shoot_cooldown = 0
+        self.visible = True
+        self.invincible = False
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -27,6 +29,8 @@ class Player(CircleShape):
         return [a, b, c]
 
     def draw(self, screen):
+        if not self.visible:
+            return
         pygame.draw.polygon(screen, "white", self.triangle(), LINE_WIDTH)
 
     def move(self, dt):
