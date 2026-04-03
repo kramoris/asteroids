@@ -12,7 +12,6 @@ def main():
     lives = 3
     respawn_timer = 0
     invincibility_timer = 0
-    player_active = True
     game_over = False
     restart_timer = 0
 
@@ -49,7 +48,7 @@ def main():
                 player.position = pygame.Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
                 player.velocity = pygame.Vector2(0, 0)
                 player.rotation = 0
-                player_active = True
+                player.active = True
                 player.visible = True
                 player.invincible = True
                 invincibility_timer = 2.0
@@ -83,7 +82,7 @@ def main():
 
             for asteroid in asteroids:
                 if (
-                    player_active
+                    player.active
                     and invincibility_timer <= 0
                     and asteroid.collides_with(player)
                 ):
@@ -91,7 +90,7 @@ def main():
                     lives -= 1
 
                     if lives > 0:
-                        player_active = False
+                        player.active = False
                         player.visible = False
                         player.invincible = False
                         respawn_timer = 1.0
