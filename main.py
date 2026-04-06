@@ -4,22 +4,29 @@ import pygame
 
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
-from constants import SCREEN_HEIGHT, SCREEN_WIDTH
-from logger import log_event, log_state
+from logger import log_event, log_state, set_logging_fps
 from player import Player
+from settings import (
+    get_setting_options,
+    load_settings,
+    reset_settings,
+    save_settings,
+)
 from shot import Shot
 
 
 MENU_ITEMS = ["Start Game", "Options", "Quit"]
+OPTIONS_ITEMS = ["Resolution Width", "Resolution Height", "FPS Limit", "Reset to Defaults", "Back"]
 
 
 def draw_centered_text(screen, font, text, color, y):
+    screen_width = screen.get_width()
     surface = font.render(text, True, color)
-    rect = surface.get_rect(center=(SCREEN_WIDTH / 2, y))
+    rect = surface.get_rect(center=(screen_width / 2, y))
     screen.blit(surface, rect)
 
 
-def reset_game(player, asteroids, shots, asteroidfield):
+def reset_game(player, asteroids, shots, asteroidfield, screen):
     if player is not None:
         player.kill()
 
@@ -31,7 +38,7 @@ def reset_game(player, asteroids, shots, asteroidfield):
 
     asteroidfield.spawn_timer = 0.0
 
-    player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+    player = Player(screen.get_width() / 2, screen.get_height() / 2)
 
     return {
         "player": player,
@@ -43,13 +50,38 @@ def reset_game(player, asteroids, shots, asteroidfield):
     }
 
 
-def main():
-    print(f"Starting Asteroids with pygame version: {pygame.version.ver}")
-    print(f"Screen width: {SCREEN_WIDTH}\nScreen height: {SCREEN_HEIGHT}")
+def apply_resolution(settings):
+    return pygame.display.set_mode(
+        (settings["screen_width"], settings["screen_height"])
+    )
 
+
+def adjust_setting(settings, key, direction):
+    rule = get_setting_options(key)
+    new_value = settings[key] + rule["step"] * direction
+    new_value = max(rule["min"], min(rule["max"], new_value))
+    settings[key] = new_value
+
+
+def option_label(item, settings):
+    if item == "Resolution Width":
+        return f"Resolution Width: {settings['screen_width']}"
+    if item == "Resolution Height":
+        return f"Resolution Height: {settings['screen_height']}"
+    if item == "FPS Limit":
+        return f"FPS Limit: {settings['fps_limit']}"
+    return item
+
+
+def main():
     pygame.init()
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+    settings = load_settings()
+    set_logging_fps(settings["fps_limit"])
+
+    screen = apply_resolution(settings)
     pygame.display.set_caption("Asteroids")
+
     clock = pygame.time.Clock()
 
     title_font = pygame.font.SysFont(None, 72)
@@ -66,11 +98,12 @@ def main():
     AsteroidField.containers = (updatable,)
     Shot.containers = (shots, updatable, drawable)
 
-    asteroidfield = AsteroidField()
+    asteroidfield = AsteroidField(screen.get_width(), screen.get_height())
     player = None
 
     state = "menu"
     selected_menu_index = 0
+    selected_options_index = 0
 
     lives = 3
     score = 0
@@ -85,6 +118,7 @@ def main():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                save_settings(settings)
                 pygame.quit()
                 sys.exit()
 
@@ -103,7 +137,7 @@ def main():
 
                         if selected_item == "Start Game":
                             game_data = reset_game(
-                                player, asteroids, shots, asteroidfield
+                                player, asteroids, shots, asteroidfield, screen
                             )
                             player = game_data["player"]
                             lives = game_data["lives"]
@@ -117,16 +151,66 @@ def main():
                             state = "options"
 
                         elif selected_item == "Quit":
+                            save_settings(settings)
                             pygame.quit()
                             sys.exit()
 
                     elif event.key == pygame.K_ESCAPE:
+                        save_settings(settings)
                         pygame.quit()
                         sys.exit()
 
             elif state == "options":
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
+                    current_item = OPTIONS_ITEMS[selected_options_index]
+
+                    if event.key == pygame.K_UP:
+                        selected_options_index = (selected_options_index - 1) % len(OPTIONS_ITEMS)
+                    elif event.key == pygame.K_DOWN:
+                        selected_options_index = (selected_options_index + 1) % len(OPTIONS_ITEMS)
+                    elif event.key == pygame.K_LEFT:
+                        if current_item == "Resolution Width":
+                            adjust_setting(settings, "screen_width", -1)
+                            screen = apply_resolution(settings)
+                            asteroidfield.screen_width = screen.get_width()
+                        elif current_item == "Resolution Height":
+                            adjust_setting(settings, "screen_height", -1)
+                            screen = apply_resolution(settings)
+                            asteroidfield.screen_height = screen.get_height()
+                        elif current_item == "FPS Limit":
+                            adjust_setting(settings, "fps_limit", -1)
+                            set_logging_fps(settings["fps_limit"])
+                        save_settings(settings)
+
+                    elif event.key == pygame.K_RIGHT:
+                        if current_item == "Resolution Width":
+                            adjust_setting(settings, "screen_width", 1)
+                            screen = apply_resolution(settings)
+                            asteroidfield.screen_width = screen.get_width()
+                        elif current_item == "Resolution Height":
+                            adjust_setting(settings, "screen_height", 1)
+                            screen = apply_resolution(settings)
+                            asteroidfield.screen_height = screen.get_height()
+                        elif current_item == "FPS Limit":
+                            adjust_setting(settings, "fps_limit", 1)
+                            set_logging_fps(settings["fps_limit"])
+                        save_settings(settings)
+
+                    elif event.key in (
+                        pygame.K_RETURN,
+                        pygame.K_KP_ENTER,
+                        pygame.K_SPACE,
+                    ):
+                        if current_item == "Reset to Defaults":
+                            settings = reset_settings()
+                            set_logging_fps(settings["fps_limit"])
+                            screen = apply_resolution(settings)
+                            asteroidfield.screen_width = screen.get_width()
+                            asteroidfield.screen_height = screen.get_height()
+                        elif current_item == "Back":
+                            state = "menu"
+
+                    elif event.key == pygame.K_ESCAPE:
                         state = "menu"
 
             elif state == "playing":
@@ -136,6 +220,7 @@ def main():
             elif state == "game_over":
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
+                        save_settings(settings)
                         pygame.quit()
                         sys.exit()
                     else:
@@ -145,12 +230,12 @@ def main():
 
         if state == "menu":
             draw_centered_text(
-                screen, title_font, "ASTEROIDS", "white", SCREEN_HEIGHT / 2 - 140
+                screen, title_font, "ASTEROIDS", "white", screen.get_height() / 2 - 140
             )
 
             for index, item in enumerate(MENU_ITEMS):
                 color = "yellow" if index == selected_menu_index else "white"
-                y = SCREEN_HEIGHT / 2 - 20 + index * 60
+                y = screen.get_height() / 2 - 20 + index * 60
                 prefix = "> " if index == selected_menu_index else "  "
                 draw_centered_text(screen, menu_font, f"{prefix}{item}", color, y)
 
@@ -159,33 +244,42 @@ def main():
                 info_font,
                 "Up/Down to navigate, Enter to select",
                 "gray",
-                SCREEN_HEIGHT / 2 + 200,
+                screen.get_height() / 2 + 200,
             )
 
         elif state == "options":
             draw_centered_text(
-                screen, title_font, "OPTIONS", "white", SCREEN_HEIGHT / 2 - 80
+                screen, title_font, "OPTIONS", "white", screen.get_height() / 2 - 180
             )
+
+            for index, item in enumerate(OPTIONS_ITEMS):
+                color = "yellow" if index == selected_options_index else "white"
+                y = screen.get_height() / 2 - 60 + index * 50
+                prefix = "> " if index == selected_options_index else "  "
+                draw_centered_text(
+                    screen,
+                    menu_font,
+                    f"{prefix}{option_label(item, settings)}",
+                    color,
+                    y,
+                )
+
             draw_centered_text(
                 screen,
                 info_font,
-                "Options coming soon.",
-                "white",
-                SCREEN_HEIGHT / 2,
-            )
-            draw_centered_text(
-                screen,
-                info_font,
-                "Press ESC to return to menu.",
+                "Left/Right changes values, Enter selects, ESC returns",
                 "gray",
-                SCREEN_HEIGHT / 2 + 60,
+                screen.get_height() / 2 + 180,
             )
 
         elif state == "playing":
             if respawn_timer > 0:
                 respawn_timer -= dt
                 if respawn_timer <= 0:
-                    player.position = pygame.Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+                    player.position = pygame.Vector2(
+                        screen.get_width() / 2,
+                        screen.get_height() / 2,
+                    )
                     player.velocity = pygame.Vector2(0, 0)
                     player.rotation = 0
                     player.active = True
@@ -258,14 +352,14 @@ def main():
                 title_font,
                 "GAME OVER",
                 "red",
-                SCREEN_HEIGHT / 2 - 60,
+                screen.get_height() / 2 - 60,
             )
             draw_centered_text(
                 screen,
                 info_font,
                 f"Final Score: {score}",
                 "white",
-                SCREEN_HEIGHT / 2 + 10,
+                screen.get_height() / 2 + 10,
             )
 
             if game_over_timer <= 0:
@@ -274,11 +368,11 @@ def main():
                     info_font,
                     "Press any key to return to menu, or ESC to quit",
                     "gray",
-                    SCREEN_HEIGHT / 2 + 70,
+                    screen.get_height() / 2 + 70,
                 )
 
         pygame.display.flip()
-        dt = clock.tick(60) / 1000
+        dt = clock.tick(settings["fps_limit"]) / 1000
 
 
 if __name__ == "__main__":
