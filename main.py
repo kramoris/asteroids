@@ -13,6 +13,7 @@ from settings import (
     save_settings,
 )
 from shot import Shot
+from sound import GameSounds
 
 
 MENU_ITEMS = ["Start Game", "Options", "Quit"]
@@ -32,7 +33,7 @@ def draw_centered_text(screen, font, text, color, y):
     screen.blit(surface, rect)
 
 
-def reset_game(player, asteroids, shots, asteroidfield, screen):
+def reset_game(player, asteroids, shots, asteroidfield, screen, sounds):
     if player is not None:
         player.kill()
 
@@ -44,7 +45,7 @@ def reset_game(player, asteroids, shots, asteroidfield, screen):
 
     asteroidfield.spawn_timer = 0.0
 
-    player = Player(screen.get_width() / 2, screen.get_height() / 2)
+    player = Player(screen.get_width() / 2, screen.get_height() / 2, sounds)
     player.active = False
     player.visible = True
     player.invincible = False
@@ -84,6 +85,9 @@ def option_label(item, settings):
 
 def main():
     pygame.init()
+
+    sounds = GameSounds()
+    sounds.initialize()
 
     settings = load_settings()
     set_logging_fps(settings["fps_limit"])
@@ -150,7 +154,7 @@ def main():
 
                         if selected_item == "Start Game":
                             game_data = reset_game(
-                                player, asteroids, shots, asteroidfield, screen
+                                player, asteroids, shots, asteroidfield, screen, sounds
                             )
                             player = game_data["player"]
                             lives = game_data["lives"]

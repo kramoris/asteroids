@@ -13,13 +13,14 @@ from shot import Shot
 
 
 class Player(CircleShape):
-    def __init__(self, x, y):
+    def __init__(self, x, y, sounds=None):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
         self.shoot_cooldown = 0
         self.visible = True
         self.invincible = False
         self.active = True
+        self.sounds = sounds
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -50,6 +51,9 @@ class Player(CircleShape):
         self.shoot_cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS
         shot = Shot(self.position.x, self.position.y)
         shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
+        
+        if self.sounds:
+            self.sounds.play_shoot()
 
     def update(self, dt):
         if not self.active:
