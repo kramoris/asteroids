@@ -35,7 +35,7 @@ python3 main.py
 
 ## Controls
 
-W / ↑ – move
-A / ← – rotate left
-D / → – rotate right
-Space / Enter – shoot
+W / ↑ – move  
+A / ← – rotate left  
+D / → – rotate right  
+Space / Enter – shoot  
