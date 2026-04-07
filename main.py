@@ -347,6 +347,7 @@ def main():
                         log_event("asteroid_shot")
                         shot.kill()
                         asteroid.split()
+                        sounds.play_impact()
                         score += 10
                         break
 
