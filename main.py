@@ -325,6 +325,7 @@ def main():
                     and asteroid.collides_with(player)
                 ):
                     log_event("player_hit")
+                    sounds.play_player_destroyed()
                     lives -= 1
 
                     if lives > 0:

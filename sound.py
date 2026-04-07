@@ -2,7 +2,7 @@ from pathlib import Path
 import random
 
 import pygame
-from constants import SHOOT_VOLUME, IMPACT_VOLUME
+from constants import SHOOT_VOLUME, IMPACT_VOLUME, PLAYER_DESTROYED_VOLUME
 
 
 class GameSounds:
@@ -10,6 +10,7 @@ class GameSounds:
         self.enabled = False
         self.shoot_sounds = []
         self.impact_sounds = []
+        self.player_destroyed_sound = None
 
     def initialize(self):
         try:
@@ -30,11 +31,16 @@ class GameSounds:
 
         self.impact_sounds = [
             pygame.mixer.Sound(str(sounds_dir / f"impact-hit{i}.wav"))
-            for i in range(1, 3)
+            for i in range(1, 4)
         ]
 
         for sound in self.impact_sounds:
             sound.set_volume(IMPACT_VOLUME)
+        
+        sound_path = sounds_dir / "player-destroyed.wav"
+        if sound_path.exists():
+            self.player_destroyed_sound = pygame.mixer.Sound(str(sound_path))
+            self.player_destroyed_sound.set_volume(PLAYER_DESTROYED_VOLUME)
 
     def play_shoot(self):
         if not self.enabled or not self.shoot_sounds:
@@ -47,3 +53,9 @@ class GameSounds:
             return
 
         random.choice(self.impact_sounds).play()
+
+    def play_player_destroyed(self):
+        if not self.enabled or not self.player_destroyed_sound:
+            return
+
+        self.player_destroyed_sound.play()
