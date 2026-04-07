@@ -4,7 +4,6 @@ import pygame
 
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
-from logger import log_event, log_state, set_logging_fps
 from player import Player
 from settings import (
     get_setting_options,
@@ -90,7 +89,6 @@ def main():
     sounds.initialize()
 
     settings = load_settings()
-    set_logging_fps(settings["fps_limit"])
 
     screen = apply_resolution(settings)
     pygame.display.set_caption("Asteroids")
@@ -127,8 +125,6 @@ def main():
     dt = 0
 
     while True:
-        log_state()
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 save_settings(settings)
@@ -200,7 +196,6 @@ def main():
                             asteroidfield.screen_height = screen.get_height()
                         elif current_item == "FPS Limit":
                             adjust_setting(settings, "fps_limit", -1)
-                            set_logging_fps(settings["fps_limit"])
                         save_settings(settings)
 
                     elif event.key == pygame.K_RIGHT:
@@ -214,7 +209,6 @@ def main():
                             asteroidfield.screen_height = screen.get_height()
                         elif current_item == "FPS Limit":
                             adjust_setting(settings, "fps_limit", 1)
-                            set_logging_fps(settings["fps_limit"])
                         save_settings(settings)
 
                     elif event.key in (
@@ -224,7 +218,6 @@ def main():
                     ):
                         if current_item == "Reset to Defaults":
                             settings = reset_settings()
-                            set_logging_fps(settings["fps_limit"])
                             screen = apply_resolution(settings)
                             asteroidfield.screen_width = screen.get_width()
                             asteroidfield.screen_height = screen.get_height()
@@ -324,7 +317,6 @@ def main():
                     and invincibility_timer <= 0
                     and asteroid.collides_with(player)
                 ):
-                    log_event("player_hit")
                     sounds.play_player_destroyed()
                     lives -= 1
 
@@ -345,7 +337,6 @@ def main():
             for asteroid in list(asteroids):
                 for shot in list(shots):
                     if shot.collides_with(asteroid):
-                        log_event("asteroid_shot")
                         shot.kill()
                         asteroid.split()
                         sounds.play_impact()
