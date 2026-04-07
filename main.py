@@ -16,7 +16,13 @@ from shot import Shot
 
 
 MENU_ITEMS = ["Start Game", "Options", "Quit"]
-OPTIONS_ITEMS = ["Resolution Width", "Resolution Height", "FPS Limit", "Reset to Defaults", "Back"]
+OPTIONS_ITEMS = [
+    "Resolution Width",
+    "Resolution Height",
+    "FPS Limit",
+    "Reset to Defaults",
+    "Back",
+]
 
 
 def draw_centered_text(screen, font, text, color, y):
@@ -39,12 +45,15 @@ def reset_game(player, asteroids, shots, asteroidfield, screen):
     asteroidfield.spawn_timer = 0.0
 
     player = Player(screen.get_width() / 2, screen.get_height() / 2)
+    player.active = False
+    player.visible = True
+    player.invincible = False
 
     return {
         "player": player,
         "lives": 3,
         "score": 0,
-        "respawn_timer": 0,
+        "respawn_timer": 0.25,
         "invincibility_timer": 0,
         "game_over_timer": 0,
     }
@@ -125,9 +134,13 @@ def main():
             if state == "menu":
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
-                        selected_menu_index = (selected_menu_index - 1) % len(MENU_ITEMS)
+                        selected_menu_index = (selected_menu_index - 1) % len(
+                            MENU_ITEMS
+                        )
                     elif event.key == pygame.K_DOWN:
-                        selected_menu_index = (selected_menu_index + 1) % len(MENU_ITEMS)
+                        selected_menu_index = (selected_menu_index + 1) % len(
+                            MENU_ITEMS
+                        )
                     elif event.key in (
                         pygame.K_RETURN,
                         pygame.K_KP_ENTER,
@@ -165,9 +178,13 @@ def main():
                     current_item = OPTIONS_ITEMS[selected_options_index]
 
                     if event.key == pygame.K_UP:
-                        selected_options_index = (selected_options_index - 1) % len(OPTIONS_ITEMS)
+                        selected_options_index = (selected_options_index - 1) % len(
+                            OPTIONS_ITEMS
+                        )
                     elif event.key == pygame.K_DOWN:
-                        selected_options_index = (selected_options_index + 1) % len(OPTIONS_ITEMS)
+                        selected_options_index = (selected_options_index + 1) % len(
+                            OPTIONS_ITEMS
+                        )
                     elif event.key == pygame.K_LEFT:
                         if current_item == "Resolution Width":
                             adjust_setting(settings, "screen_width", -1)
