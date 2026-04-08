@@ -2,7 +2,7 @@
 
 Asteroids-style arcade game built with Python and pygame.
 
-Built with a modular structure and gradually expanded gameplay systems.
+Modular project structure with separated game states, entities, and systems.
 
 ## Requirements
 
@@ -36,6 +36,8 @@ python3 main.py
 ## Controls
 
 W / ↑ – move  
+S / ↓ – move backward  
 A / ← – rotate left  
 D / → – rotate right  
 Space / Enter – shoot  
+ESC – return to menu / exit  

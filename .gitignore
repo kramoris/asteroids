@@ -9,17 +9,18 @@ wheels/
 # Virtual environments
 .venv
 
+# IDE
+.vscode/
+.idea/
+
+# OS jumk
+.DS_Store
+Thumbs.db
+
 # uv
 .python-version
 pyproject.toml
 uv.lock
-
-# Game log
-game_state.jsonl
-game_events.jsonl
-
-# TODO
-.TODO
 
 # Settings
 settings.json

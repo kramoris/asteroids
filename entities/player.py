@@ -1,7 +1,6 @@
 import pygame
 
-from circleshape import CircleShape
-from constants import (
+from config.constants import (
     LINE_WIDTH,
     PLAYER_RADIUS,
     PLAYER_SHOOT_COOLDOWN_SECONDS,
@@ -9,7 +8,8 @@ from constants import (
     PLAYER_SPEED,
     PLAYER_TURN_SPEED,
 )
-from shot import Shot
+from entities.circle_shape import CircleShape
+from entities.shot import Shot
 
 
 class Player(CircleShape):
@@ -51,7 +51,7 @@ class Player(CircleShape):
         self.shoot_cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS
         shot = Shot(self.position.x, self.position.y)
         shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
-        
+
         if self.sounds:
             self.sounds.play_shoot()
 

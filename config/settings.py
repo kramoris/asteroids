@@ -1,8 +1,12 @@
 import json
 from pathlib import Path
 
-from settings_defaults import DEFAULT_SETTINGS
 
+DEFAULT_SETTINGS = {
+    "screen_width": 1280,
+    "screen_height": 720,
+    "fps_limit": 60,
+}
 
 SETTINGS_FILE = Path("settings.json")
 
